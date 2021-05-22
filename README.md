@@ -11,6 +11,7 @@ CPU power is rarely the limiting factor anymore, it is the data size that is.
 There are many technology options out there, and our task is to figure out the most appropriate tools and approaches for the task; that is to ensure that the data remains correct and complete, provide good performance, and scale to handle load increase, despite any internal failures, or system degradations.
 
 #### Reliability
+
 ***System should continue to work correctly, even in the face of faults and human errors***.
 
 A fault is a one component of the system deviating from its specs, while failure is the when the system as a whole stops working. It's impossible to prevent faults, but we should try to prevent faults from causing failures by designing fault-tolerance mechanisms.
@@ -26,8 +27,8 @@ Some approaches for making reliable systems, in spite of unreliable human action
 - Make it fast to roll back configuration changes, and provide tools to re-compute data.
 - Use proper monitoring that shows early warnings signals of faults.
 
-
 #### Scalability
+
 ***As system grows, there should be reasonable ways for dealing with that growth***.
 
 The first step in scaling a system is to define the system's loads parameters (eg. requests, read to write ratio, etc.)
@@ -42,8 +43,8 @@ Elastic system is useful if load is highly unpredictable, but manually scaled sy
 
 In an early stage startup, it's more important to be able to iterate quickly on product features than to scale to some hypothetical future load.
 
-
 #### Maintainability
+
 ***Different people who works on the system should all be able to work on it productively***
 
 The majority of the cost of the software is in the ongoing maintenance and not the initial development.
@@ -55,13 +56,11 @@ A good system should be operable, which means making routine tasks easy. This ca
 - Providing good default behavior, while giving administrators the option to override
 - Self-healing, while giving administrators a manual control
 
-A good system should be simple, this can be done by reducing complexity, which does not necessarily mean reducing its functionality, but rather by making **abstractions**.
+A good system should be simple, this can be done by reducing complexity, which doesn't necessarily mean reducing its functionality, but rather by making **abstractions**.
 
 Simple and easy to understand systems are usually easier to modify than complex ones.
 
 A good system should be evolvable, which means making it easily adapt the changes. Agile is one of the best working patterns for maintaining evolvable systems.
-
-
 
 ### Chapter 2: Data Models and Query Languages
 
@@ -102,7 +101,6 @@ For document databases to benefit from *locality*, documents have to be relative
 
 A hybrid of relational and document models might be the future of databases, as they are becoming more similar over time.
 
-
 #### Query Languages
 
 SQL is attractive to people due to its *declarative* nature, it specifies the pattern of the resulted data instead of the way of querying it. Also, declarative code is easier to parallelize across multiple machines.
@@ -113,15 +111,13 @@ Graph data model is usually the most suitable model for data with a lot of **man
 
 Graph data model is different from network model in the way it gives much greater flexibility for applications to adapt.
 
-
-
 ### Chapter 3: Storage and Retrieval
 
 #### Data Structures That Powers Your Database
 
 The simplest and best efficient write operation is simply appending to a file.
 
-Databases doesn't usually index everything by default, but require you to choose indexes manually.
+Databases doesn't usually index everything by default, but require us to choose indexes manually.
 
 Hash Index is an in-memory key-value store that maps every key to its byte offset in the data file. New records are appended to a *segment* of certain size which is being merged and compacted by a background thread, allowing for old segments to be deleted. For reliability and concurrency, only one thread is used for writing, and a snapshot of segment's hash map is written to disk regularly.
 
@@ -129,7 +125,7 @@ Append-only logs allow faster sequential writes opposed to random writes, it hav
 
 Log-Structured Merge-Tree (LSM-Tree) uses a similar concept to the Hash Index, but rather using an in-memory balanced tree (eg. AVL, Red-Black) to keep records sorted. Writes are very fast as it is an append-only operations, while for reads it first checks the *memory table*, then the most recent file segment, then the next-older, and so on. If the database crashes, then the most recent writes are lost, to avoid that, every write is immediately appended to secondary disk log file.
 
-LSM-Trees provides a segment merging mechanism that is simple and efficient, it no longer need to keep and index for all keys in memory (thanks to sorting), and it is possible to group and compress records before writing to disk. However it can be very slow when looking for keys that does not exist (A *bloom filter* might help with that).
+LSM-Trees provides a segment merging mechanism that is simple and efficient, it no longer need to keep and index for all keys in memory (thanks to sorting), and it is possible to group and compress records before writing to disk. However it can be very slow when looking for keys that doesn't exist (A *bloom filter* might help with that).
 
 B-Tree index is the most widely used indexing structure. It's the standard index for almost all relational databases. It breaks the database down into fixed-size pages (4 KB in size) which is the same size as the disk's page.
 
@@ -153,7 +149,6 @@ Disadvantages for LSM-Trees over B-Trees:
 - Un-merged segments might keep growing until filling up the disk space
 - Same key might exist in multiple segments
 
-
 In addition to *primary key index*, databases can have non-unique *secondary indexes*, that are often crucial for joins in relational databases. Both B-Trees and LSM-Trees can have *secondary indexes*.
 
 Storing all row data within the index (*clustered index*) can allow some queries to be answered using index alone.
@@ -164,7 +159,6 @@ Fuzzy indexes can help in querying *similar keys* when the exact key is unknown,
 
 In-memory databases are much faster but less durable and more expensive. It thus needs to write to disk asynchronously in case it had to restart. It is great for small datasets, and for modeling complex data models (eg. queues, sets) 
 
-
 #### Transaction Processing or Analytics?
 
 Businesses usually have two types databases, *online transaction processing* (OLTP) for every-day transactions, and *online analytic processing* for analytics purposes (Also known as *Data Warehouse*).
@@ -173,7 +167,6 @@ Data Warehouse's goal is to provide the same data in the *transaction processing
 
 Big advantage of having a separate warehouse is that it can be optimized for analytic access patterns, specially that typical OLTP indexing engines don't perform well in the case of analytic queries, but it's usually relational because SQL is good for analytic queries.
 
-
 #### Column-Oriented Storage
 
 Typical data warehouse tables are very wide, and typical warehouse queries only access few of them at a time. So instead of storing each row's data together, it is more efficient to store each column's data together. This can work for both relational and non-relational models.
@@ -181,8 +174,6 @@ Typical data warehouse tables are very wide, and typical warehouse queries only 
 Column-based datastores can benefit of data repetition by compression, and from CPU cycles by *vectorized processing*, but this makes writes more difficult (eg. in-place update is not possible). We can solve this by using in-memory structure same as LSM-Trees, which sorted and accumulated before it's written to disk.
 
 A helpful technique for data warehouse is *materialized aggregates*, which caches some of the aggregated data that are used most often. In relational model, this can be created using *materialized views*.
-
-
 
 ### Chapter 4: Encoding and Evolution
 
@@ -197,7 +188,6 @@ Language-specific encoding formats can be easier in decoding, however, it's usua
 Binary encoding can save a lot of space for huge datasets, however it might be not worth the loss of human-readability for small ones.
 
 Some binary encoding libraries (eg. Thrift, Protocol Buffers) come with code generation tools the produces schema classes given a schema. They can be more compact than textual data formats, and always have an up-to-date documentation.
-
 
 #### Models of Dataflow
 
@@ -235,8 +225,6 @@ One downside is that is is one-way communication, so for the recipient to reply 
 
 Message brokers usually have one or more set of topics, and when a message is sent to a specific topic, the broker pass it all topic's subscribers. This creates a freedom for processes to publish messages to another topics upon receiving a message.
 
-
-
 ## Part II: Distributed Data
 
 ### Chapter 5: Replication
@@ -263,7 +251,6 @@ Writes that are sent to followers can take many forms, some are:
 - **Logical log replication**, where different log formats are used to allow the log to decouple from the engine's internals. It also allows *backward compatibility*
 - **Trigger-based replication**, it gives much flexibility for the application code to determine what to replicate. It's useful when flexibility is needed, but it's prone to more bugs and limitations, as well as greater overhead
 
-
 #### Problems with Replication Lag
 
 *Leader-based* replication suits workloads with mostly reads and small percentage of writes, but realistically it has to be asynchronous.
@@ -276,7 +263,6 @@ Writes that are sent to followers can take many forms, some are:
 
 When using *eventual consistency*, if we cannot live with a lag that increases to several minutes, a stronger guarantee should be used.
 
-
 #### Multi-Leader Replication
 
 When a process is replicated across many datacenters, we can have a leader in *each* datacenter, this provides better performance due to hidden network delays, as well as failure tolerance as each datacenter can continue operating independently, and also better tolerance for network problems due to asynchronous replication. However, data may be concurrently modified in two different datacenters, so those write conflicts must be resolved.
@@ -286,7 +272,6 @@ Some retrofitted features in databases such as auto-incrementing keys, triggers,
 Since handling conflicts can be very tricky, avoiding them is the recommended approach. However when resolution is needed, some ways would be to give each write a unique ID and the highest ID wins, give each replica a unique ID and the higher takes precedence, merge conflicting values together, or record the conflicts in an explicit data structure.
 
 *Multi-leader replication* comes in various topologies, the most common are *all-to-all*, *circular*, and *star* topologies. A problem with circular and star topologies is that they have a single point of failure. All-to-all topology doesn't have this problem, but it may have problems with causality as some network links might be faster than others.
-
 
 #### Leaderless Replication
 
@@ -308,7 +293,6 @@ The problem with *eventual consistency* is that if each node simply overwrote th
 - **Merge values**, it guarantees the we don't lose any of the conflicting data, and then it's up to the application how to show them
 - **Version vectors (version clock)**, which is assigning a version number per replica, and each replica has to increment it's number after every write, if an array of all version numbers is passed alongside the operations, it would be easy to detect inconsistency
 
-
 ### Chapter 6: Partitioning
 
 For huge datasets that doesn't fit in a single database, or for scalability purposes, partitioning (sharding) is the solution. Typically each piece of data belongs to exactly one partition, and a single operation might need to touch multiple partitions at once. Thus, complex queries should be parallelized across many nodes.
@@ -327,7 +311,6 @@ There are two main ways of partitioning keys:
 
 One problem still is when most reads and writes are for the same key (eg. celebrity account ID), it is usually left for the application to handle this skew, typically by assigning random bytes at the beginning/end of this key to scatter it across all the replicas, however, this requires extra bookkeeping, as well as requests to all the replicas when reading.
 
-
 #### Partitioning of Secondary Indexes
 
 Secondary indexes are important to all relational databases, and also some document databases. However, they don't map neatly to partitions.
@@ -335,7 +318,6 @@ Secondary indexes are important to all relational databases, and also some docum
 One option is to add an extra secondary index inside every partition, this index would cover-up only the keys in the partition. However, if the client needs to find all fields with a common secondary field, it has to query all partitions.
 
 Another option is to have a global secondary index which can also be partitioned, but using *term* instead of *document*. Every partition would keep a secondary index of some of these terms, this makes reads more efficient, but writes are slower and complicated. However, in practice updates to global secondary indexes are asynchronous and very fast.
-
 
 #### Rebalancing Partitions
 
@@ -353,7 +335,6 @@ Another alternative is **dynamic partitioning**, which acts similarly to the top
 Another option is **Partitioning proportionally to nodes**, which is to have a fixed number of partitions per node. When a new node joins, it picks fixed number of random partitions to split and take half of them. However, the randomization might produce unfair splits.
 
 Having a completely automated re-balancing process can be very unpredictable, so it's good to have a human in the loop for re-balancing.
-
 
 #### Request Routing
 
@@ -391,11 +372,11 @@ Many popular relational databases that are considered "ACID" use weak isolation 
 
 The most basic level of transaction isolation is **read committed**, which simply just prevents dirty reads and dirty writes.
 
-**Dirty reads** is when a transaction can read another transaction's write that has not been committed yet, this is useful because if the transaction needs to update several objects, other transactions might see some updates but not others, and if the transaction aborts, any writes would need to rollback. To prevent dirty reads, a lock might be used, however, this harms the response time, so a better approach is to remember both the old and new values, and give the old value to any read request before commitment.
+**Dirty reads** is when a transaction can read another transaction's write that hasn't been committed yet, this is useful because if the transaction needs to update several objects, other transactions might see some updates but not others, and if the transaction aborts, any writes would need to rollback. To prevent dirty reads, a lock might be used, however, this harms the response time, so a better approach is to remember both the old and new values, and give the old value to any read request before commitment.
 
 **Dirty writes** is when a transaction write overwrites another transaction's uncommitted write, this is useful because if the transaction updates multiple objects, dirty writes can lead to bad outcome, however, preventing it still doesn't prevent some other race conditions. Most databases prevents dirty writes by using row-level locks.
 
-Read committed isolation does not protect against **read skew**, where a transaction reads different parts from the database in different points of time, this can be cause issues for situations like backups, analytic queries, or integrity checks.
+Read committed isolation doesn't protect against **read skew**, where a transaction reads different parts from the database in different points of time, this can be cause issues for situations like backups, analytic queries, or integrity checks.
 
 The solution to read skews is **snapshot isolation**, where each transaction reads from a consistent snapshot of the database, as if it was frozen at a particular point in time. It is usually implemented using write locks, but readers doesn't require any locks.
 
@@ -409,7 +390,7 @@ There are variety of solutions that has been developed for solving the lost upda
 - Atomic writes, which is usually the best solution if the code can be expressed in terms of operations, that is like `UPDATE counters SET value = value + 1 WHERE ...`. Unfortunately not all writes can be expressed this way, and it's easy with ORMs to miss things up
 - Explicit locking, where the application explicitly locks objects that are being updated: `SELECT * FROM ... WHERE ... FOR UPDATE`
 - Automatically deleting lost updates, where the database allows the transaction to execute in parallel, and detects a lost update if happened, abort the transaction and force it to retry. An advantage to this is that the database performs the check efficiently in conjunction with snapshot isolation, and the detection happens automatically and is thus less error-prone
-- Compare and set, where only to allow the update to happen only if the value has not changed since last read: `UPDATE ... SET ... WHERE id = ... AND content = "same old content"`. However this might fail if the database allows reading from old snapshots.
+- Compare and set, where only to allow the update to happen only if the value hasn't changed since last read: `UPDATE ... SET ... WHERE id = ... AND content = "same old content"`. However this might fail if the database allows reading from old snapshots.
 - Conflict resolution, as in replicated databases, techniques based on locks and compare-set doesn't apply, so one approach is to allow concurrent writes to create several conflicting versions, and let the application code to resolve (using *last write wins*) or merge them
 
 Two other race conditions that can still happen are write skew and phantom reads.
@@ -418,10 +399,9 @@ Two other race conditions that can still happen are write skew and phantom reads
 
 **Phantom reads** occurs when, in the course of a transaction, new rows are added or removed by another transaction to the records being read, and there is no way to put locks on rows that might not be existing yet. This can be solved using *materialized conflicts* which is more like an artificial lock to the database. But, serializable isolation is always preferred over this approach.
 
-
 #### Serializability
 
-Isolation levels are hard to understand, you cannot tell if an application code is safe just by looking, and there are no good tools to help with that. So, the simple solution is just to use *serializable isolation*, which is the strongest isolation level and prevents *all* race conditions.
+Isolation levels are hard to understand, we cannot tell if an application code is safe just by looking, and there are no good tools to help with that. So, the simple solution is just to use *serializable isolation*, which is the strongest isolation level and prevents *all* race conditions.
 
 *Serializable isolation* can be implemented through different techniques, actual serial execution, two phase locking, and optimistic concurrency.
 
@@ -435,7 +415,6 @@ The big downside of two-phase locking is the performance, which is much worse co
 
 **Serializable Snapshot Isolation (SSI)** is an optimistic concurrency control technique that is fairly new but fast enough becoming the new default in the future. Instead of blocking if something potentially dangerous happens, transactions continue anyways, and the database checks for conflicts only when transaction commits, this reduces the number of unnecessary aborts. It perform badly if there is high contention, but this contention can be reduced with commutative atomic operations. Also, same as two phase locking, SSI can be partitioned and distributed which doesn't tie the performance to a single CPU core.
 
-
 ### Chapter 8: The Trouble with Distributed Systems
 
 The main difference between a single computer and a distributed system, is that in distributed systems there are lots of ways for things to go wrong, and we should assume that it *will* go wrong.
@@ -444,7 +423,7 @@ The main difference between a single computer and a distributed system, is that 
 
 A program that runs on a single computer is *deterministic*, it usually either fully function or entirely break, while in a distributed system, some parts can break in some unpredictable *nondeterministic* way, even though other parts of the system are working fine.
 
-If you want to make distributed systems work, we must accept the possibility of partial failure and build fault-tolerance mechanisms into the software. This is achieved by knowing what behavior to expect from the software in the case of fault, consider wide range of possible faults, and artificially create such situations in your testing environment to see what happens.
+If we want to make distributed systems work, we must accept the possibility of partial failure and build fault-tolerance mechanisms into the software. This is achieved by knowing what behavior to expect from the software in the case of fault, consider wide range of possible faults, and artificially create such situations in our testing environment to see what happens.
 
 #### Unreliable Networks
 
@@ -468,7 +447,7 @@ Modern computers have at least two different kinds of clocks:
 - **Time-of-delay clock**, which is usually synchronized with NTP to return the current date and time, but it is unsuitable for measuring elapsed time.
 - **Monotonic clock**, which is guaranteed to always move forward, therefore suitable for measuring duration (eg. timeouts), but has a meaningless absolute value. It also may use NTP to adjust its frequency: how fast it moves forward.
 
-Unfortunately, our methods for getting a clock to tell the correct time aren't nearly as reliable or accurate. However, we can manage to get a good enough accuracy using GPS receivers, Precision Time Protocol (PTP), and careful deployment and monitoring. Such monitoring ensures that you notice broken clocks before they cause too much damage.
+Unfortunately, our methods for getting a clock to tell the correct time aren't nearly as reliable or accurate. However, we can manage to get a good enough accuracy using GPS receivers, Precision Time Protocol (PTP), and careful deployment and monitoring. Such monitoring ensures that we notice broken clocks before they cause too much damage.
 
 Robust software needs to be prepared to deal with incorrect clocks.
 
@@ -507,7 +486,6 @@ The most useful model in real systems is the *partially synchronous model* with 
 It's important to distinguish between two kind of properties, *safety* and *liveness*, because it is common to require that safety properties always hold, while with liveness properties we are allowed to make caveats.
 
 We do have to make some assumptions about faults that can happen. However, real implementation might still have to handle impossible cases, even by just firing an error message.
-
 
 ### Chapter 9: Consistency and Consensus
 
@@ -635,7 +613,6 @@ Distributed file systems open the possibility of dumping data in file systems, a
 
 MapReduce approach is more appropriate for large jobs that takes a long time, and likely to experience at least one failure.
 
-
 #### Beyond MapReduce
 
 MapReduce's approach is fully materialized, which means to eagerly compute results of some operations and write them out rather than computing them on demand. This prevents any job from starting until all its preceding jobs are completed, mappers are often redundant, and this extra intermediate storage have to be replicated which wastes a lot of resources.
@@ -674,7 +651,6 @@ A variation of message brokers called *log-based brokers*, uses a combination of
 
 Log-based messages brokers are suitable in situations with high message throughput, fast processing, and when message ordering is important, while typical JMS/AMQP brokers are typically used when messages are expensive to process, and parallelization is needed.
 
-
 #### Database and Streams
 
 A database can be represented as a stream, where an *event* can be something that was written to a database, it can be captured, stored, and processed. This representation opens up powerful opportunities for integrating systems.
@@ -685,12 +661,11 @@ A better approach for data sync is *change data capture* (CDC), which is the pro
 a
 Another approach similar to CDC is *event sourcing*, which records the user's actions (commands) as immutable events rather than the effects of the action. It allows that new side effects easily be chained off the existing events, but it also requires the application to log events and transform it deterministically into application state, thus requiring log compaction as well.
 
-What makes both CDC and event sourcing powerful is the principle of immutability. especially that mutable state and append-only log of immutable events do not contradict each other. This makes it easier to diagnose bugs, help capture more information than just the current state, and makes it easier to evolve the application over time. Also we gain a great flexibility by separating the form of writing from the form of reading data, thus, allowing multiple read views.
+What makes both CDC and event sourcing powerful is the principle of immutability. especially that mutable state and append-only log of immutable events don't contradict each other. This makes it easier to diagnose bugs, help capture more information than just the current state, and makes it easier to evolve the application over time. Also we gain a great flexibility by separating the form of writing from the form of reading data, thus, allowing multiple read views.
 
-The biggest downside of CDC and event sourcing is that the consumers of the event log are usually asynchronous, which might lead to failure in *reading you own writes*. One solution is perform updates on read view synchronously, but a better approach might be to implement linearizable storage using total order broadcast. However, if the event log and application state are partitioned in the same way, then a single-threaded log consumer needs no concurrency control for writes.
+The biggest downside of CDC and event sourcing is that the consumers of the event log are usually asynchronous, which might lead to failure in *reading your own writes*. One solution is perform updates on read view synchronously, but a better approach might be to implement linearizable storage using total order broadcast. However, if the event log and application state are partitioned in the same way, then a single-threaded log consumer needs no concurrency control for writes.
 
 The limitations of immutability is that immutable history may grow very large, causing the system to perform poorly. Also, for administrative reasons, data must be completely deleted in some cases, which is surprisingly hard.
-
 
 #### Processing Streams
 
