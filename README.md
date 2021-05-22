@@ -2,7 +2,9 @@
 
 Although being one of the most important books for the software industry, as it bridges the gap between distributed systems theory and practical engineering, I struggled to find a good summarized reading notes that covers up all the key points of the book, so here it is, I hope.
 
-This reading notes are biased towards *what to do* rather than *how it works*. The main goal behind it is to be a quick one page look-up for people wishing to remember some small details, or for someone who wish to recap the highlights of the whole book in less than an hour. However, a fair amount of *how it works* explanation details is included.
+This reading notes are biased towards *what to do* rather than *how it works*. The main goal behind it is to be a quick one page look-up for people wishing to remember some of details on the fly, or for someone who wish to recap the highlights of the whole book in less than an hour. However, a fair amount of *how it works* explanation details are included.
+
+The book is available for purchase [here](https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/).
 
 ## Table of Content
 - [Part I: Foundation of Data Systems](#p1)
@@ -782,6 +784,6 @@ Predictive analytics systems which usually rely on machine learning can be very 
 
 We should not retain data forever, but purge it as soon as it is no longer needed. This contradicts with the idea of immutability, but a promising approach might be to enforce access control through cryptographic protocols, rather than merely by policy.
 
-### <a name="more">More Reading Notes</a>
+## <a name="more">More Reading Notes</a>
 - [Software Architecture Patterns](https://github.com/ahmedhammad97/Software-Architecture-Patterns-Notes)
 - [Clean Code](https://github.com/ahmedhammad97/Clean-Code-Do-And-Dont)
