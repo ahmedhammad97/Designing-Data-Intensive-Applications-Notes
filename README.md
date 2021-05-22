@@ -2,9 +2,29 @@
 
 Although being one of the most important books for the software industry, as it bridges the gap between distributed systems theory and practical engineering, I struggled to find a good summarized reading notes that covers up all the key points of the book, so here it is, I hope.
 
-## Part I: Foundation of Data Systems
+This reading notes are biased towards *what to do* rather than *how it works*. The main goal behind it is to be a quick one page look-up for people wishing to remember some small details, or for someone who wish to recap the highlights of the whole book in less than an hour. However, a fair amount of *how it works* explanation details is included.
 
-### Chapter 1: Reliable, Scalable, and Maintainable Applications
+## Table of Content
+- [Part I: Foundation of Data Systems](#p1)
+	- [Chapter 1: Reliable, Scalable, and Maintainable Applications](#ch1)
+	- [Chapter 2: Data Models and Query Languages](#ch2)
+	- [Chapter 3: Storage and Retrieval](#ch3)
+	- [Chapter 4: Encoding and Evolution](#ch4)
+- [Part II: Distributed Data](#p2)
+	- [Chapter 5: Replication](#ch5)
+	- [Chapter 6: Partitioning](#ch6)
+	- [Chapter 7: Transactions](#ch7)
+	- [Chapter 8: The Trouble with Distributed Systems](#ch8)
+	- [Chapter 9: Consistency and Consensus](#ch9)
+- [Part III: Derived Data](#p3)
+	- [Chapter 10: Batch Processing](#ch10)
+	- [Chapter 11: Stream Processing](#ch11)
+	- [Chapter 12: The Future of Data Systems](#ch12)
+- [More Reading Notes](#more)
+
+## <a name="p1">Part I: Foundation of Data Systems</a>
+
+### <a name="ch1">Chapter 1: Reliable, Scalable, and Maintainable Applications</a>
 
 CPU power is rarely the limiting factor anymore, it is the data size that is.
 
@@ -62,7 +82,7 @@ Simple and easy to understand systems are usually easier to modify than complex 
 
 A good system should be evolvable, which means making it easily adapt the changes. Agile is one of the best working patterns for maintaining evolvable systems.
 
-### Chapter 2: Data Models and Query Languages
+### <a name="ch2">Chapter 2: Data Models and Query Languages</a>
 
 #### Data Models
 
@@ -111,7 +131,7 @@ Graph data model is usually the most suitable model for data with a lot of **man
 
 Graph data model is different from network model in the way it gives much greater flexibility for applications to adapt.
 
-### Chapter 3: Storage and Retrieval
+### <a name="ch3">Chapter 3: Storage and Retrieval</a>
 
 #### Data Structures That Powers Your Database
 
@@ -175,7 +195,7 @@ Column-based datastores can benefit of data repetition by compression, and from 
 
 A helpful technique for data warehouse is *materialized aggregates*, which caches some of the aggregated data that are used most often. In relational model, this can be created using *materialized views*.
 
-### Chapter 4: Encoding and Evolution
+### <a name="ch4">Chapter 4: Encoding and Evolution</a>
 
 Changes to the application's features also requires a change to data that it stores, this means that multiple versions of code and multiple data formats may coexist at the same time. Thus, *backward compatibility* and *forward compatibility* should be maintained.
 
@@ -225,9 +245,9 @@ One downside is that is is one-way communication, so for the recipient to reply 
 
 Message brokers usually have one or more set of topics, and when a message is sent to a specific topic, the broker pass it all topic's subscribers. This creates a freedom for processes to publish messages to another topics upon receiving a message.
 
-## Part II: Distributed Data
+## <a name="p2">Part II: Distributed Data</a>
 
-### Chapter 5: Replication
+### <a name="ch5">Chapter 5: Replication</a>
 
 If the data doesn't change, replication would be as simple as copying it once to other replicas, but the difficulty lies in handling changes if it does, because we usually have to deal with many trade-offs such as sync vs async replication, and how to handle failed replicas.
 
@@ -293,7 +313,7 @@ The problem with *eventual consistency* is that if each node simply overwrote th
 - **Merge values**, it guarantees the we don't lose any of the conflicting data, and then it's up to the application how to show them
 - **Version vectors (version clock)**, which is assigning a version number per replica, and each replica has to increment it's number after every write, if an array of all version numbers is passed alongside the operations, it would be easy to detect inconsistency
 
-### Chapter 6: Partitioning
+### <a name="ch6">Chapter 6: Partitioning</a>
 
 For huge datasets that doesn't fit in a single database, or for scalability purposes, partitioning (sharding) is the solution. Typically each piece of data belongs to exactly one partition, and a single operation might need to touch multiple partitions at once. Thus, complex queries should be parallelized across many nodes.
 
@@ -342,7 +362,7 @@ Similar to all network systems, *service discovery* problem needs to be approach
 
 Many distributed systems rely on a coordination service such as **Zoo-Keeper** for solving this problem, that is by keeping track of cluster's metadata including partitioning.
 
-### Chapter 7: Transactions
+### <a name="ch7">Chapter 7: Transactions</a>
 
 A transaction is a way of an application to group several reads and writes together into a logical unit, which either succeeds or fails entirely.
 
@@ -415,7 +435,7 @@ The big downside of two-phase locking is the performance, which is much worse co
 
 **Serializable Snapshot Isolation (SSI)** is an optimistic concurrency control technique that is fairly new but fast enough becoming the new default in the future. Instead of blocking if something potentially dangerous happens, transactions continue anyways, and the database checks for conflicts only when transaction commits, this reduces the number of unnecessary aborts. It perform badly if there is high contention, but this contention can be reduced with commutative atomic operations. Also, same as two phase locking, SSI can be partitioned and distributed which doesn't tie the performance to a single CPU core.
 
-### Chapter 8: The Trouble with Distributed Systems
+### <a name="ch8">Chapter 8: The Trouble with Distributed Systems</a>
 
 The main difference between a single computer and a distributed system, is that in distributed systems there are lots of ways for things to go wrong, and we should assume that it *will* go wrong.
 
@@ -487,7 +507,7 @@ It's important to distinguish between two kind of properties, *safety* and *live
 
 We do have to make some assumptions about faults that can happen. However, real implementation might still have to handle impossible cases, even by just firing an error message.
 
-### Chapter 9: Consistency and Consensus
+### <a name="ch9">Chapter 9: Consistency and Consensus</a>
 
 The simplest way of handling system faults is to simply let the entire system fail, and then show an error message. But, the best way is to have a general-purpose abstraction with useful guarantees that we can implement.
 
@@ -566,7 +586,7 @@ Some limitations of consensus algorithms include: it requires a strict majority 
 
 One of the most important applications of fault-tolerant consensus algorithms are membership and coordination services (eg. ZooKeeper), they are used in linearizable atomic operations, total ordering of operations, failure detection, change notifications, allocating work to nodes, and service discovery. However, they're usually used indirectly through other services.
 
-## Part III: Derived Data
+## <a name="p3">Part III: Derived Data</a>
 
 Systems often consist if multiple databases, indexes, caches, and analytics systems, thus, it needs to implement mechanisms for moving data from one store to another.
 
@@ -574,7 +594,7 @@ Systems that stores and process data can be grouped into two broad categories:
 - System of records: acts as a source of truth, and holds the authoritative version of any new coming data, while being represented only once, and usually normalized.
 - Derived data systems: the result of transforming or processing data from other source. It can easily be recreated from its original source if lost. Its commonly denormalized and redundant, but is essential for good read performance.
 
-### Chapter 10: Batch Processing
+### <a name="ch10">Chapter 10: Batch Processing</a>
 
 All systems can fit into three main categories:
 - Services (online), where it waits for requests, tries to handle them as quickly as possible, and sends back a response.
@@ -629,7 +649,7 @@ One of the biggest advantages of batch processing jobs compared to typical datab
 
 Batch processing has an increasingly important applications in statistical and numerical algorithms, machine learning, recommendation systems, and computing spatial algorithms as well.
 
-### Chapter 11: Stream Processing
+### <a name="ch11">Chapter 11: Stream Processing</a>
 
 Some problems of batch processing are that it has to read the entire input before processing, and that the input is reflected to output after a very long period (up to days sometimes), stream processing come into place as a solution for these two problems, where processing is run over small chunks of input for a very small time frames (usually less than a second).
 
@@ -695,7 +715,7 @@ In order to provide fault-tolerance to stream processing, we might want to break
 
 An alternative for transactions is *idempotence writes*, which are operations that can be performed multiple times and still has the effect as if it was performed once. Any operation can be made idempotent with some extra metadata.
 
-### Chapter 12: The Future of Data Systems
+### <a name="ch12">Chapter 12: The Future of Data Systems</a>
 
 #### Data Integration
 
@@ -761,3 +781,7 @@ Every system is built for a purpose which has both intended and unintended conse
 Predictive analytics systems which usually rely on machine learning can be very misleading. If there is a systematic bias in the input, the system will most likely learn and amplify that bias in the output.
 
 We should not retain data forever, but purge it as soon as it is no longer needed. This contradicts with the idea of immutability, but a promising approach might be to enforce access control through cryptographic protocols, rather than merely by policy.
+
+### <a name="more">More Reading Notes</a>
+- [Software Architecture Patterns](https://github.com/ahmedhammad97/Software-Architecture-Patterns-Notes)
+- [Clean Code](https://github.com/ahmedhammad97/Clean-Code-Do-And-Dont)
