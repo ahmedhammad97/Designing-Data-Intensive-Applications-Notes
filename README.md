@@ -125,7 +125,7 @@ The simplest and best efficient write operation is simply appending to a file.
 
 Databases doesn't usually index everything by default, but require you to choose indexes manually.
 
-Hash Index is an in-memory key-value store that maps every key to its byte offset in the data file. New records are appended to a *segment* of certain size which is being merged and compacted by a background thread, allowing for old segments to be deleted. For reliability and concurrency, only one thread is used for writing, and a snapshot of segment's hashmap is written to disk regularly.
+Hash Index is an in-memory key-value store that maps every key to its byte offset in the data file. New records are appended to a *segment* of certain size which is being merged and compacted by a background thread, allowing for old segments to be deleted. For reliability and concurrency, only one thread is used for writing, and a snapshot of segment's hash map is written to disk regularly.
 
 Append-only logs allow faster sequential writes opposed to random writes, it have much simpler concurrency and crash recovery scenarios, and the merging mechanism avoids files getting fragmented over time. However, the hash table must fit in memory, and it doesn't support range queries.
 
@@ -203,7 +203,7 @@ Some binary encoding libraries (eg. Thrift, Protocol Buffers) come with code gen
 
 #### Models of Dataflow
 
-The most common ways for data flow between processes are using a database, service call (REST, RPC, etc.), or async message passing.
+The most common ways for dataflow between processes are using a database, service call (REST, RPC, etc.), or async message passing.
 
 Dataflow through database is like the process is sending a future message to itself, it requires both *backward compatibility* and *forward compatibility*. A workaround the compatibility issue can be through rewriting the whole database into new schema every time it changes, however it's an expensive thing to do for large databases.
 
@@ -341,20 +341,20 @@ Another option is to have a global secondary index which can also be partitioned
 
 #### Rebalancing Partitions
 
-Over time, data has to be moved from one node to another, this *rebalancing* process is usually expected to meet some minimum requirements:
-- After rebalancing, the load should be shared fairly between nodes
-- While rebalancing, the database should continue accepting reads and writes
+Over time, data has to be moved from one node to another, this *re-balancing* process is usually expected to meet some minimum requirements:
+- After re-balancing, the load should be shared fairly between nodes
+- While re-balancing, the database should continue accepting reads and writes
 - Data shouldn't be moved between nodes more than necessary
 
-A top of mind strategy for rebalancing might be using `mod` operation for the hash of the key, but this turns out to be very bad because if the number of nodes changes, most keys will need to be moved.
+A top of mind strategy for re-balancing might be using `mod` operation for the hash of the key, but this turns out to be very bad because if the number of nodes changes, most keys will need to be moved.
 
-A good alternative is to have a **fixed number of partitions**, by creating many more partitions than there are nodes, and assign several partitions to each node, and when a node is added to the cluster, it steals some partitions as are from older nodes. This can allow us to assign more partitions to nodes that are more powerful, but since the number is fixed, partitions can get very large, thus making rebalancing and recovery from failures very expensive, and if they are too small, it is too much overhead.
+A good alternative is to have a **fixed number of partitions**, by creating many more partitions than there are nodes, and assign several partitions to each node, and when a node is added to the cluster, it steals some partitions as are from older nodes. This can allow us to assign more partitions to nodes that are more powerful, but since the number is fixed, partitions can get very large, thus making re-balancing and recovery from failures very expensive, and if they are too small, it is too much overhead.
 
-Another alternative is **dynamic partitioning**, which acts similarly to the top level of a B-tree, when partitions exceeds a configured size, it's split into two partitions, and when shrinks when goes below another configured size, then partitions can be moved to different nodes for rebalancing the load. The big advantage is that the number of partitions adapts to the total volume.
+Another alternative is **dynamic partitioning**, which acts similarly to the top level of a B-tree, when partitions exceeds a configured size, it's split into two partitions, and when shrinks when goes below another configured size, then partitions can be moved to different nodes for re-balancing the load. The big advantage is that the number of partitions adapts to the total volume.
 
 Another option is **Partitioning proportionally to nodes**, which is to have a fixed number of partitions per node. When a new node joins, it picks fixed number of random partitions to split and take half of them. However, the randomization might produce unfair splits.
 
-Having a completely automated rebalancing process can be very unpredictable, so it's good to have a human in the loop for rebalancing.
+Having a completely automated re-balancing process can be very unpredictable, so it's good to have a human in the loop for re-balancing.
 
 
 #### Request Routing
@@ -615,7 +615,7 @@ Reasons that Unix tools are so successful includes that the input files are trea
 
 The biggest limitation of Unix tools is that it can only run on a single machine, that's where tools like Hadoop come in.
 
-#### MapReduce and Distributed Filesystems
+#### MapReduce and Distributed File Systems
 
 Same as Unix tools, MapReduce job doesn't modify the input, but it can be distributed across thousands of machines, and instead of using local file system, it reads and writes to distributed file system (eg. HDFS).
 
@@ -640,13 +640,13 @@ MapReduce approach is more appropriate for large jobs that takes a long time, an
 
 #### Beyond MapReduce
 
-MapReduce's approach is fully materialzed, which means to eagerly compute results of some operations and write them out rather than computing them on demand. This prevents any job from starting until all its preceding jobs are completed, mappers are often redundant, and this extra intermediate storage have to be replicated which wastes a lot of resources.
+MapReduce's approach is fully materialized, which means to eagerly compute results of some operations and write them out rather than computing them on demand. This prevents any job from starting until all its preceding jobs are completed, mappers are often redundant, and this extra intermediate storage have to be replicated which wastes a lot of resources.
 
 MapReduce also has some other limitations apart from materialization, where implementing complex job using the raw MapReduce APIs is quite hard, and it provides poor performance for some kind of processing.
 
 Dataflow engines (eg. Spark, Tex, Flink, etc.) overcome MapReduce disadvantages by handling and entire workflow as one job, rather than small independent sub-jobs. It also provides more flexible callback functions (*operations*) rather than only map and reduce.
 
-We can use dataflow engines to implement the same computations as MapReduce, but it executes significantly faster. However, because they dismiss the intermediate materialization, they have to to recompute most of the data when the job fails. However, the recomputation overhead of dataflow engines makes it challenging to use it with small data or CPU-intensive computations, so materialization would be cheaper.
+We can use dataflow engines to implement the same computations as MapReduce, but it executes significantly faster. However, because they dismiss the intermediate materialization, they have to to recompute most of the data when the job fails. However, the re-computation overhead of dataflow engines makes it challenging to use it with small data or CPU-intensive computations, so materialization would be cheaper.
 
 Higher-level languages and APIs (eg. Hive, Pig) has the advantages of requiring less code, while also allowing interactive use. Moreover, it also improves the job execution efficiency at the machine level.
 
@@ -668,7 +668,7 @@ Messaging systems allows multiple producers nodes to send messages to the same t
 
 When a producer sends messages faster than the consumer can process, consumers can either drop the messages, buffer them in a queue, or block the producer from sending more messages. And for durability, a combination of writing messages to disk and having replication might be used, but with a cost of lower throughput and higher latency.
 
-One option for a messaging systems is direct network communication, such as UDP multicast, brokerless messaging libraries, or direct HTTP or RPC requests. However, their biggest drawback is that they require applications to be aware of loss possibility.
+One option for a messaging systems is direct network communication, such as UDP multi-cast, broker-less messaging libraries, or direct HTTP or RPC requests. However, their biggest drawback is that they require applications to be aware of loss possibility.
 
 Another more widely used option is communication via a *message broker* or *message queue*, which acts as a server that both producers and consumers connects to, it automatically deletes a message after delivery, it supports some way of subscribing to a subset of topics, and it notifies clients when data changes. Message Broker can decide to distribute the event load among consumers, or deliver all messages to all consumers, or a combination of both.
 
@@ -754,7 +754,7 @@ The ideas of stream processing and messaging and not restricted to datacenters, 
 
 #### Aiming for Correctness
 
-Transactions have been the choice for building correct applications for more than four decades by now, and while in some areas they have been completely abandoned for their overheads, they are not going away, but also correctness can be achieved in the context of data flow.
+Transactions have been the choice for building correct applications for more than four decades by now, and while in some areas they have been completely abandoned for their overheads, they are not going away, but also correctness can be achieved in the context of dataflow.
 
 Data systems that provide strong safety properties (eg. serializable transactions) are not guaranteed to be free from data loss or corruption. However, it would be easier to recover from such mistakes by preventing faulty code from destroying good (immutable) data. One of the most effective approaches to achieve this is to make all operations *idempotent*.
 
