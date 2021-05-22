@@ -8,9 +8,7 @@ Although being one of the most important books for the software industry, as it 
 
 CPU power is rarely the limiting factor anymore, it is the data size that is.
 
-There are many technology options out there, and our task is to figure out the most appropriate tools and approaches for the task.
-
-We need to ensure that the data remains correct and complete, provide good performance, and scale to handle load increase, despite any internal failures, or system degradations.
+There are many technology options out there, and our task is to figure out the most appropriate tools and approaches for the task; that is to ensure that the data remains correct and complete, provide good performance, and scale to handle load increase, despite any internal failures, or system degradations.
 
 #### Reliability
 ***System should continue to work correctly, even in the face of faults and human errors***.
@@ -34,7 +32,7 @@ Some approaches for making reliable systems, in spite of unreliable human action
 
 The first step in scaling a system is to define the system's loads parameters (eg. requests, read to write ratio, etc.)
 
-Throughput is usually the most important metric in batch processing systems, while *response time* is the most important metrics for online systems.
+Throughput is the most important metric in batch processing systems, while *response time* is the most important metrics for online systems.
 
 A common performance metric is percentile, where `Xth percentile = Y ms` means that `X%` of the requests will perform better than `Y ms`. It's important to optimize for a high percentile, as customers with slowest requests often have the most data (eg. purchases). However, over optimizing (eg. 99.999th) might be too expensive.
 
@@ -42,7 +40,7 @@ It's important to measure response times on client side against realistic traffi
 
 Elastic system is useful if load is highly unpredictable, but manually scaled systems are simpler and have fewer operational surprises.
 
-In an early stage startup, it's usually more important to be able to iterate quickly on product features than to scale to some hypothetical future load.
+In an early stage startup, it's more important to be able to iterate quickly on product features than to scale to some hypothetical future load.
 
 
 #### Maintainability
@@ -247,7 +245,7 @@ If the data doesn't change, replication would be as simple as copying it once to
 
 #### Leaders and Followers
 
-*Leader-based* replication allows writes to only go through the leader, which then sends it to all other *follower replicas*. The clients then can query any replica including the leader. Although its limitation, it's one of the most used replication algorithms in databases and message brokers.
+*Leader-based* replication allows writes to only go through the leader, which then sends it to all other *followers*. The clients then can query any replica including the leader. Although its limitation, it's one of the most used replication algorithms in databases and message brokers.
 
 Synchronous replication guarantees the followers to have and up-to-date copy of the data, but if one follower didn't respond, the write cannot proceed, that's why in practice only one of few other replicas are synchronous, while other are async. Even that sync replication normally is quite fast, there is not guarantee about its latency, that's why async replication is widely used.
 
@@ -332,7 +330,7 @@ One problem still is when most reads and writes are for the same key (eg. celebr
 
 #### Partitioning of Secondary Indexes
 
-Secondary indexes are very important to all relational databases, and some document databases as well. However, they don't map neatly to partitions.
+Secondary indexes are important to all relational databases, and also some document databases. However, they don't map neatly to partitions.
 
 One option is to add an extra secondary index inside every partition, this index would cover-up only the keys in the partition. However, if the client needs to find all fields with a common secondary field, it has to query all partitions.
 
@@ -341,7 +339,7 @@ Another option is to have a global secondary index which can also be partitioned
 
 #### Rebalancing Partitions
 
-Over time, data has to be moved from one node to another, this *re-balancing* process is usually expected to meet some minimum requirements:
+Over time, data has to be moved from one node to another, this *re-balancing* process is expected to meet some minimum requirements:
 - After re-balancing, the load should be shared fairly between nodes
 - While re-balancing, the database should continue accepting reads and writes
 - Data shouldn't be moved between nodes more than necessary
@@ -401,7 +399,7 @@ Read committed isolation does not protect against **read skew**, where a transac
 
 The solution to read skews is **snapshot isolation**, where each transaction reads from a consistent snapshot of the database, as if it was frozen at a particular point in time. It is usually implemented using write locks, but readers doesn't require any locks.
 
-The difference between snapshot isolation reads and read committed, is that snapshot isolation keeps *several* versions of an object instead of just two.
+Snapshot isolation reads differ from read committed in that it keeps *several* versions of an object instead of just two.
 
 Indexing might sound like a problem for snapshot isolation, but one solution is to have the index point to *all* versions of an object, while another approach is to use an append-only/copy-on-write variant that doesn't overwrite pages in the underlying tree.
 
@@ -672,7 +670,7 @@ One option for a messaging systems is direct network communication, such as UDP 
 
 Another more widely used option is communication via a *message broker* or *message queue*, which acts as a server that both producers and consumers connects to, it automatically deletes a message after delivery, it supports some way of subscribing to a subset of topics, and it notifies clients when data changes. Message Broker can decide to distribute the event load among consumers, or deliver all messages to all consumers, or a combination of both.
 
-A variation of message brokers called *log-based brokers*, uses a combination of the durable storage approach of databases, and the low-latency notification facilities of messaging. It is able to achieve very high throughput while partitioning across multiple machines, and providing fault tolerance. It is very appropriate for stream processing systems that consume input streams and generate derived state or derived output streams.
+A variation of message brokers called *log-based brokers*, uses a combination of the durable storage approach of databases, and the low-latency notification facilities of messaging. It is able to achieve high throughput while partitioning across multiple machines, and providing fault tolerance. It is appropriate for stream processing systems that consume input streams and generate derived state or derived output streams.
 
 Log-based messages brokers are suitable in situations with high message throughput, fast processing, and when message ordering is important, while typical JMS/AMQP brokers are typically used when messages are expensive to process, and parallelization is needed.
 
@@ -702,7 +700,7 @@ Stream processing acts like batch processing in the way that is consumes input i
 
 Stream Processing is useful in monitoring systems such as fraud detection, financial markets, and factory machines status.
 
-*Complex event processing* (CEP) is a an approach that stores queries in the long-term, and then try to continuously match it with input streams.
+*Complex event processing* (CEP) is an approach that stores queries in the long-term, and try to continuously match it with input streams.
 
 Analytics are usually aggregated over a period of time, this time interval is known as *window*. Many stream processing frameworks use the local system clock for determining windowing, but it breaks down if there is any significant processing lag. So usually 
 
@@ -769,7 +767,7 @@ Traditionally, executing transactions across multiple partitions requires an ato
 
 Consistency conflates two different requirements, which are *timeliness* and *integrity*. Violation of timeliness is eventual consistency, whereas violation of integrity is *perpetual consistency* and can be catastrophic!
 
-Event-based dataflow systems decouples timeliness and integrity, where there is no guarantee of timeliness, but integrity can be achieved through:
+Event-based dataflow systems decouples timeliness and integrity, there is no guarantee of timeliness, but integrity can be achieved through:
 - Representing the content of the atomic write operation as a single message
 - Deriving all other state updates from the single message using deterministic derivation functions
 - Passing a client-generated request ID through all these levels of processing, enabling end-to-end duplicate suppression
