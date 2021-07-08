@@ -787,3 +787,4 @@ We should not retain data forever, but purge it as soon as it is no longer neede
 ## <a name="more">More Reading Notes</a>
 - [Software Architecture Patterns](https://github.com/ahmedhammad97/Software-Architecture-Patterns-Notes)
 - [Clean Code](https://github.com/ahmedhammad97/Clean-Code-Do-And-Dont)
+- [Principles of Package Desgin](https://github.com/ahmedhammad97/Principles-of-Package-Design-Reading-Notes)
